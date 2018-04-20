@@ -8,33 +8,12 @@
 //  Import CSS.
 import './style.scss';
 import './editor.scss';
-import _ from 'lodash';
 
 const { __ } = wp.i18n; // Import __() from wp.i18n
 const { registerBlockType } = wp.blocks; // Import registerBlockType() from wp.blocks
 const { Component } = wp.element;
 const { InspectorControls } = wp.blocks;
 const { Button, TextControl, SelectControl } = wp.components;
-
-
-// get our settings
-let settings;
-let interval;
-
-function checkIfWeCanGetSettings() {
-	interval = setInterval(getSettings, 1000);
-}
-
-function getSettings() {
-	if(typeof wp.api !== 'undefined') {
-		wp.api.loadPromise.then( () => {
-			settings = new wp.api.models.Settings();
-		});
-		clearInterval(interval);
-	}
-}
-
-checkIfWeCanGetSettings();
 
 function debounce(fn, delay) {
   var timer = null;
@@ -53,22 +32,18 @@ class EditorComponent extends Component {
 		this.state = {
 			simple_weather_api_key: '',
 			isSaving: false,
-			weather: false,
-			cityLastUpdateTime: new Date()
+			weather: false
 		};
 	}
 
 	componentDidMount() {
-		const that = this;
-		let editorInterval = setInterval(function() {
-			if(settings) {
-				// get our setting
-				settings.fetch().then( response => {
-					that.setState({ simple_weather_api_key: response.simple_weather_api_key });
-				});
-				clearInterval(editorInterval);
-			}
-		}, 1000);
+		wp.api.loadPromise.then( () => {
+			const settings = new wp.api.models.Settings();
+			// get our setting
+			settings.fetch().then( response => {
+				this.setState({ simple_weather_api_key: response.simple_weather_api_key });
+			});
+		});
 	}
 
 	componentDidUpdate(prevProps, prevState) {
