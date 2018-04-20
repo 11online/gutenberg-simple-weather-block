@@ -164,7 +164,11 @@ class EditorComponent extends Component {
 					weather.main
 						?
 							<div className="wp-block-cgb-block-gutenberg-simple-weather-api">
-								<p>Right now in {attributes.city} it is {weather.main.temp}&deg;{units} and {weather.weather[0].main}.</p>
+								<h3>{attributes.city}</h3>
+								<div className='weather-block'>
+									<h4>{weather.main.temp}&deg;{units}</h4>
+									<h4>{weather.weather[0].main}</h4>
+								</div>
 							</div>
 						:
 							<p>No Weather</p>

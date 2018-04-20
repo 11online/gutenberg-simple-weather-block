@@ -128,6 +128,6 @@ function renderSimpleWeatherAPIBlock( $attributes ) {
 		}
 		$temp = $weather->main->temp;
 		$clouds = $weather->weather[0]->main;
-		return "<div class='wp-block-cgb-block-gutenberg-simple-weather-api'><p>Right now in $city it is $temp&deg;$units and $clouds.</p></div>";
+		return "<div class='wp-block-cgb-block-gutenberg-simple-weather-api'><h3>$city</h3><div class='weather-block'><h4>$temp&deg;$units</h4><h4>$clouds</h4></div></div>";
 	}
 }

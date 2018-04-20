@@ -5,10 +5,18 @@
  */
 
 .wp-block-cgb-block-gutenberg-simple-weather-api  {
-  background: $red;
-  border: 0.2rem solid $black;
-  color: $black;
+  border: 1px solid $black;
   margin: 0 auto;
-  max-width: 740px;
-  padding: 2rem;
+  max-width: 400px;
+  display: block;
+  padding: 1rem;
+  text-align: center;
+  border-radius: 5px;
+  .weather-block {
+  	display: flex;
+  	h4 {
+  		flex: 1;
+  		padding: 0;
+  	}
+  }
 }
