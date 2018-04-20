@@ -48,7 +48,7 @@ class EditorComponent extends Component {
 
 	componentDidUpdate(prevProps, prevState) {
 		// only update the weather if the city changes, we don't currently have weather or we we didn't currently have an api key
-		if(prevProps.attributes.city !== this.props.attributes.city || this.state.weather === false || prevState.simple_weather_api_key === '') {
+		if(prevProps.attributes.city !== this.props.attributes.city || prevProps.attributes.units !== this.props.attributes.units || this.state.weather === false || prevState.simple_weather_api_key === '') {
 			this.getWeather();
 		}
 	}
