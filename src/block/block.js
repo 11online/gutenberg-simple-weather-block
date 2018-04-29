@@ -11,10 +11,11 @@ import './editor.scss';
 
 const { __ } = wp.i18n; // Import __() from wp.i18n
 const { registerBlockType } = wp.blocks; // Import registerBlockType() from wp.blocks
-const { Component } = wp.element;
-const { InspectorControls } = wp.blocks;
-const { Button, TextControl, SelectControl } = wp.components;
+const { Component } = wp.element; // Import the Gutenberg React Component
+const { InspectorControls } = wp.blocks; // Import the Inspector Controls for more settings
+const { Button, TextControl, SelectControl } = wp.components; // import a button and some controls
 
+// A simple debounce function so we don't over fetch our weather
 function debounce(fn, delay) {
   var timer = null;
   return function () {
@@ -26,7 +27,9 @@ function debounce(fn, delay) {
   };
 }
 
+// This is the component we will use for our edit method
 class EditorComponent extends Component {
+	// the constructor will set our initial state so we don't have undefined variables
 	constructor() {
 		super();
 		this.state = {
@@ -36,40 +39,51 @@ class EditorComponent extends Component {
 		};
 	}
 
+	// We will use the React lifecycle to get our api key when the component mounts
 	componentDidMount() {
+		// use the wp global object to get our settings
 		wp.api.loadPromise.then( () => {
 			const settings = new wp.api.models.Settings();
-			// get our setting
+			// get our setting and once it is done, save it to our state so we have access to it
 			settings.fetch().then( response => {
 				this.setState({ simple_weather_api_key: response.simple_weather_api_key });
 			});
 		});
 	}
 
+	// when we get new props or state, we should check if we should refetch our weather
 	componentDidUpdate(prevProps, prevState) {
-		// only update the weather if the city changes, we don't currently have weather or we we didn't currently have an api key
+		// only update the weather if the city or unit changes, we don't currently have weather or we we didn't currently have an api key
 		if(prevProps.attributes.city !== this.props.attributes.city || prevProps.attributes.units !== this.props.attributes.units || this.state.weather === false || prevState.simple_weather_api_key === '') {
 			this.getWeather();
 		}
 	}
 
+	// this method will save our open weather api key to the options table
 	saveAPIKey = () => {
+		// set the state to isSaving so our button can have a busy animation
 		this.setState({isSaving: true});
+		// save the new api key
 		const model = new wp.api.models.Settings({ simple_weather_api_key: this.state.simple_weather_api_key });
 		model.save().then( response => {
+			// when we are done saving, change the state so the button animation stops
 			this.setState({isSaving: false})
 			// set attributes to register a change so the user can save the post
 			this.props.setAttributes({update: Math.random()})
 		});
 	}
 
+	// use the open weather api to get our weather data, debounced to prevent over fetching
 	getWeather = debounce(() => {
+		// set up our variables, city and units from the attributes and the api key from the state
 		const city = this.props.attributes.city;
-		const simple_weather_api_key = this.state.simple_weather_api_key;
 		const units = this.props.attributes.units;
+		const simple_weather_api_key = this.state.simple_weather_api_key;
+		// create a copy of this variable so we can set state after the request
 		const that = this;
+		// if we have a city and api key, then make the request
 		if(city && simple_weather_api_key) {
-			// make our api call to show on the front end
+			// make our api call to save the response to state. We don't want to save it to attributes since the weather will change
 			jQuery.ajax({
 				url: "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + simple_weather_api_key + "&units=" + units,
 			}).done(function(response) {
@@ -79,8 +93,10 @@ class EditorComponent extends Component {
 	}, 1000)
 
 	render() {
+		// set up our variables
 		const { attributes, focus, setAttributes } = this.props;
 		const weather = this.state.weather;
+		// set a more readable units variable
 		let units;
 		switch(attributes.units) {
 			case 'metric':
@@ -93,8 +109,9 @@ class EditorComponent extends Component {
 				units = 'F';
 				break;
 		}
-
+		// render returns what get shown in the editor
 		return [
+			// if we are in focus (user has selected the block), then we want to show our settings blocks, we are using some built in components. The select component uses setAttributes to change the units. The button has an onclick to save the api key.
 			focus ? (
 				<InspectorControls>
 					<SelectControl
@@ -124,6 +141,7 @@ class EditorComponent extends Component {
 			) : null,
 			<div>
 				{
+					// if we are in focus, show the city input
 					focus
 						? 
 							<TextControl
@@ -136,6 +154,7 @@ class EditorComponent extends Component {
 							null
 				}
 				{
+					// if we have weather, we'll show it, otherwise show no weather
 					weather.main
 						?
 							<div className="wp-block-cgb-block-gutenberg-simple-weather-api">
@@ -195,6 +214,7 @@ registerBlockType( 'cgb/block-gutenberg-simple-weather-api', {
 	 * @link https://wordpress.org/gutenberg/handbook/block-api/block-edit-save/
 	 */
 	save: function( ) {
+		// since we are doing server side rendering, we don't need any html saved to the content
 		return null;
 	},
 } );
