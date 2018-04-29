@@ -1,8 +1,8 @@
 /**
  * BLOCK: gutenberg-simple-weather-api
  *
- * Registering a basic block with Gutenberg.
- * Simple block, renders and saves the same content without any interactivity.
+ * A block that allows you save an open weather api key and set a city and a key to show the weather
+ * 
  */
 
 //  Import CSS.
