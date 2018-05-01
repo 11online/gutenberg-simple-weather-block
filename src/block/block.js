@@ -54,7 +54,11 @@ class EditorComponent extends Component {
 	// when we get new props or state, we should check if we should refetch our weather
 	componentDidUpdate(prevProps, prevState) {
 		// only update the weather if the city or unit changes, we don't currently have weather or we we didn't currently have an api key
-		if(prevProps.attributes.city !== this.props.attributes.city || prevProps.attributes.units !== this.props.attributes.units || this.state.weather === false || prevState.simple_weather_api_key === '') {
+		if(
+			prevProps.attributes.city !== this.props.attributes.city || 
+			prevProps.attributes.units !== this.props.attributes.units || 
+			this.state.weather === false || prevState.simple_weather_api_key === ''
+		) {
 			this.getWeather();
 		}
 	}
@@ -64,7 +68,9 @@ class EditorComponent extends Component {
 		// set the state to isSaving so our button can have a busy animation
 		this.setState({isSaving: true});
 		// save the new api key
-		const model = new wp.api.models.Settings({ simple_weather_api_key: this.state.simple_weather_api_key });
+		const model = new wp.api.models.Settings({ 
+			simple_weather_api_key: this.state.simple_weather_api_key 
+		});
 		model.save().then( response => {
 			// when we are done saving, change the state so the button animation stops
 			this.setState({isSaving: false})
