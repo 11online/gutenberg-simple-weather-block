@@ -117,7 +117,7 @@ class EditorComponent extends Component {
 		}
 		// render returns what get shown in the editor
 		return [
-			// if we are in isSelected (user has selected the block), then we want to show our settings blocks, we are using some built in components. The select component uses setAttributes to change the units. The button has an onclick to save the api key.
+			// if isSelected (user has selected the block), then we want to show our settings blocks, we are using some built in components. The select component uses setAttributes to change the units. The button has an onclick to save the api key.
 			isSelected ? (
 				<InspectorControls>
 					<SelectControl
@@ -147,7 +147,7 @@ class EditorComponent extends Component {
 			) : null,
 			<div>
 				{
-					// if we are in isSelected, show the city input
+					// if isSelected, show the city input
 					isSelected
 						? 
 							<TextControl
