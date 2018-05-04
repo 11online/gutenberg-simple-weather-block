@@ -100,7 +100,7 @@ class EditorComponent extends Component {
 
 	render() {
 		// set up our variables
-		const { attributes, focus, setAttributes } = this.props;
+		const { attributes, isSelected, setAttributes } = this.props;
 		const weather = this.state.weather;
 		// set a more readable units variable
 		let units;
@@ -117,8 +117,8 @@ class EditorComponent extends Component {
 		}
 		// render returns what get shown in the editor
 		return [
-			// if we are in focus (user has selected the block), then we want to show our settings blocks, we are using some built in components. The select component uses setAttributes to change the units. The button has an onclick to save the api key.
-			focus ? (
+			// if we are in isSelected (user has selected the block), then we want to show our settings blocks, we are using some built in components. The select component uses setAttributes to change the units. The button has an onclick to save the api key.
+			isSelected ? (
 				<InspectorControls>
 					<SelectControl
 						label={ __( 'Units' ) }
@@ -147,8 +147,8 @@ class EditorComponent extends Component {
 			) : null,
 			<div>
 				{
-					// if we are in focus, show the city input
-					focus
+					// if we are in isSelected, show the city input
+					isSelected
 						? 
 							<TextControl
 								key='city'
