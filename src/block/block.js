@@ -12,7 +12,7 @@ import './editor.scss';
 const { __ } = wp.i18n; // Import __() from wp.i18n
 const { registerBlockType } = wp.blocks; // Import registerBlockType() from wp.blocks
 const { Component } = wp.element; // Import the Gutenberg React Component
-const { InspectorControls } = wp.blocks; // Import the Inspector Controls for more settings
+const { InspectorControls } = wp.editor; // Import the Inspector Controls for more settings
 const { Button, TextControl, SelectControl } = wp.components; // import a button and some controls
 
 // A simple debounce function so we don't over fetch our weather
