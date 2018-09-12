@@ -13,19 +13,7 @@ const { __ } = wp.i18n; // Import __() from wp.i18n
 const { registerBlockType } = wp.blocks; // Import registerBlockType() from wp.blocks
 const { Component } = wp.element; // Import the Gutenberg React Component
 const { InspectorControls } = wp.editor; // Import the Inspector Controls for more settings
-const { Button, TextControl, SelectControl } = wp.components; // import a button and some controls
-
-// A simple debounce function so we don't over fetch our weather
-function debounce(fn, delay) {
-  var timer = null;
-  return function () {
-    var context = this, args = arguments;
-    clearTimeout(timer);
-    timer = setTimeout(function () {
-      fn.apply(context, args);
-    }, delay);
-  };
-}
+const { Button, TextControl, SelectControl, ServerSideRender } = wp.components; // import a button and some controls
 
 // This is the component we will use for our edit method
 class EditorComponent extends Component {
@@ -34,8 +22,7 @@ class EditorComponent extends Component {
 		super();
 		this.state = {
 			simple_weather_api_key: '',
-			isSaving: false,
-			weather: false
+			isSaving: false
 		};
 	}
 
@@ -49,18 +36,6 @@ class EditorComponent extends Component {
 				this.setState({ simple_weather_api_key: response.simple_weather_api_key });
 			});
 		});
-	}
-
-	// when we get new props or state, we should check if we should refetch our weather
-	componentDidUpdate(prevProps, prevState) {
-		// only update the weather if the city or unit changes, we don't currently have weather or we we didn't currently have an api key
-		if(
-			prevProps.attributes.city !== this.props.attributes.city || 
-			prevProps.attributes.units !== this.props.attributes.units || 
-			this.state.weather === false || prevState.simple_weather_api_key === ''
-		) {
-			this.getWeather();
-		}
 	}
 
 	// this method will save our open weather api key to the options table
@@ -79,42 +54,10 @@ class EditorComponent extends Component {
 		});
 	}
 
-	// use the open weather api to get our weather data, debounced to prevent over fetching
-	getWeather = debounce(() => {
-		// set up our variables, city and units from the attributes and the api key from the state
-		const city = this.props.attributes.city;
-		const units = this.props.attributes.units;
-		const simple_weather_api_key = this.state.simple_weather_api_key;
-		// create a copy of this variable so we can set state after the request
-		const that = this;
-		// if we have a city and api key, then make the request
-		if(city && simple_weather_api_key) {
-			// make our api call to save the response to state. We don't want to save it to attributes since the weather will change
-			jQuery.ajax({
-				url: "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + simple_weather_api_key + "&units=" + units,
-			}).done(function(response) {
-				that.setState({weather: response});
-			});
-		}
-	}, 1000)
-
 	render() {
 		// set up our variables
 		const { attributes, isSelected, setAttributes } = this.props;
-		const weather = this.state.weather;
-		// set a more readable units variable
-		let units;
-		switch(attributes.units) {
-			case 'metric':
-				units = 'C';
-				break;
-			case 'kelvin':
-				units = 'Kelvin';
-				break;
-			default:
-				units = 'F';
-				break;
-		}
+		
 		// render returns what get shown in the editor
 		return [
 			// if isSelected (user has selected the block), then we want to show our settings blocks, we are using some built in components. The select component uses setAttributes to change the units. The button has an onclick to save the api key.
@@ -159,20 +102,10 @@ class EditorComponent extends Component {
 						:
 							null
 				}
-				{
-					// if we have weather, we'll show it, otherwise show no weather
-					weather.main
-						?
-							<div className="wp-block-cgb-block-gutenberg-simple-weather-api">
-								<h3>{attributes.city}</h3>
-								<div className='weather-block'>
-									<h4>{weather.main.temp}&deg;{units}</h4>
-									<h4>{weather.weather[0].main}</h4>
-								</div>
-							</div>
-						:
-							<p>No Weather</p>
-				}
+				<ServerSideRender
+    				block="cgb/block-gutenberg-simple-weather-api"
+					attributes={ attributes }
+				/>
 			</div>
 		];
 
